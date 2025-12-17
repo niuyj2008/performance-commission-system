@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统配置管理 - 绩效提成管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      padding: 10px 20px;
+      background: #52c41a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-home:hover {
+      background: #73d13d;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e8e8e8;
+      margin-bottom: 30px;
+      gap: 10px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 15px;
+      color: #666;
+      transition: all 0.3s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab:hover {
+      color: #1890ff;
+    }
+
+    .tab.active {
+      color: #1890ff;
+      border-bottom-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1890ff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #1890ff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-danger {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ff7875;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #52c41a;
+    }
+
+    .message.error {
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      color: #ff4d4f;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      margin: 30px 0 15px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>系统配置管理</h1>
+      <a href="/index.html" class="btn-home">🏠 返回首页</a>
+    </div>
+    <p class="subtitle">配置提成计算的所有参数，默认值来自韶谷数码城项目奖金发放计算表</p>
+
+    <div id="message" class="message"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('base')">基础参数</button>
+      <button class="tab" onclick="switchTab('stage')">阶段分配</button>
+      <button class="tab" onclick="switchTab('scale')">项目规模系数</button>
+      <button class="tab" onclick="switchTab('type')">建筑类型系数</button>
+      <button class="tab" onclick="switchTab('height')">层高系数</button>
+      <button class="tab" onclick="switchTab('ac')">空调类型系数</button>
+    </div>
+
+    <!-- 基础参数 -->
+    <div id="tab-base" class="tab-content active">
+      <div class="form-row">
+        <div class="form-group">
+          <label>计算基价（元/㎡）</label>
+          <input type="number" id="basePrice" step="0.01" />
+          <div class="help-text">基础计算单价，默认22元/㎡</div>
+        </div>
+        <div class="form-group">
+          <label>提成比例</label>
+          <input type="number" id="commissionRatio" step="0.01" min="0" max="1" />
+          <div class="help-text">提成比例，默认0.27（27%）</div>
+        </div>
+      </div>
+
+      <div class="section-title">总负责分配比例</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>总负责比例</label>
+          <input type="number" id="chiefRatio" step="0.01" min="0" max="1" />
+          <div class="help-text">从施工图金额中分配给总负责的比例，默认0.07（7%）</div>
+        </div>
+        <div class="form-group">
+          <label>工种奖金比例</label>
+          <input type="number" id="departmentsRatio" step="0.01" min="0" max="1" />
+          <div class="help-text">分配给各工种的比例，默认0.93（93%）</div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveBaseParameters()">保存基础参数</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+
+    <!-- 阶段分配 -->
+    <div id="tab-stage" class="tab-content">
+      <div class="form-row">
+        <div class="form-group">
+          <label>方案设计比例</label>
+          <input type="number" id="schemeRatio" step="0.01" min="0" max="1" />
+          <div class="help-text">方案设计阶段的提成比例，默认0.15（15%）</div>
+        </div>
+        <div class="form-group">
+          <label>施工图设计比例</label>
+          <input type="number" id="constructionRatio" step="0.01" min="0" max="1" />
+          <div class="help-text">施工图设计阶段的提成比例，默认0.85（85%）</div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveStageAllocation()">保存阶段分配</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+
+    <!-- 项目规模系数 -->
+    <div id="tab-scale" class="tab-content">
+      <div class="table-container">
+        <table id="scaleTable">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>最小面积（㎡）</th>
+              <th>最大面积（㎡）</th>
+              <th>系数</th>
+            </tr>
+          </thead>
+          <tbody id="scaleTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveScaleCoefficients()">保存项目规模系数</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+
+    <!-- 建筑类型系数 -->
+    <div id="tab-type" class="tab-content">
+      <div class="table-container">
+        <table id="typeTable">
+          <thead>
+            <tr>
+              <th>类型代码</th>
+              <th>类型名称</th>
+              <th>系数</th>
+            </tr>
+          </thead>
+          <tbody id="typeTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveBuildingTypeCoefficients()">保存建筑类型系数</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+
+    <!-- 层高系数 -->
+    <div id="tab-height" class="tab-content">
+      <div class="table-container">
+        <table id="heightTable">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>最小楼层</th>
+              <th>最大楼层</th>
+              <th>系数</th>
+            </tr>
+          </thead>
+          <tbody id="heightTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveHeightCoefficients()">保存层高系数</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+
+    <!-- 空调类型系数 -->
+    <div id="tab-ac" class="tab-content">
+      <div class="table-container">
+        <table id="acTable">
+          <thead>
+            <tr>
+              <th>类型代码</th>
+              <th>类型名称</th>
+              <th>建筑</th>
+              <th>结构</th>
+              <th>给排水</th>
+              <th>电气</th>
+              <th>空调</th>
+            </tr>
+          </thead>
+          <tbody id="acTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveAirConditioningTypes()">保存空调类型系数</button>
+        <button class="btn btn-secondary" onclick="loadConfig()">重新加载</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let config = null;
+    const API_BASE = '/api';
+    let token = localStorage.getItem('token');
+
+    // 检查登录状态
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // 切换标签页
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // 显示消息
+    function showMessage(message, type = 'success') {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = message;
+      messageEl.className = `message ${type} show`;
+      setTimeout(() => {
+        messageEl.classList.remove('show');
+      }, 3000);
+    }
+
+    // 加载配置
+    async function loadConfig() {
+      try {
+        const response = await fetch(`${API_BASE}/config`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('加载配置失败');
+
+        config = await response.json();
+        renderConfig();
+        showMessage('配置加载成功');
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 渲染配置
+    function renderConfig() {
+      // 基础参数
+      document.getElementById('basePrice').value = config.baseParameters.basePrice;
+      document.getElementById('commissionRatio').value = config.baseParameters.commissionRatio;
+      document.getElementById('chiefRatio').value = config.chiefAllocation.chief;
+      document.getElementById('departmentsRatio').value = config.chiefAllocation.departments;
+
+      // 阶段分配
+      document.getElementById('schemeRatio').value = config.stageAllocation.scheme;
+      document.getElementById('constructionRatio').value = config.stageAllocation.construction;
+
+      // 项目规模系数
+      renderScaleTable();
+
+      // 建筑类型系数
+      renderTypeTable();
+
+      // 层高系数
+      renderHeightTable();
+
+      // 空调类型系数
+      renderAcTable();
+    }
+
+    // 渲染项目规模系数表
+    function renderScaleTable() {
+      const tbody = document.getElementById('scaleTableBody');
+      tbody.innerHTML = '';
+      
+      config.scaleCoefficients.ranges.forEach((range, index) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td><input type="text" value="${range.name}" data-index="${index}" data-field="name" class="scale-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" value="${range.minArea}" data-index="${index}" data-field="minArea" class="scale-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" value="${range.maxArea}" data-index="${index}" data-field="maxArea" class="scale-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.01" value="${range.coefficient}" data-index="${index}" data-field="coefficient" class="scale-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+        `;
+      });
+    }
+
+    // 渲染建筑类型系数表
+    function renderTypeTable() {
+      const tbody = document.getElementById('typeTableBody');
+      tbody.innerHTML = '';
+      
+      Object.entries(config.buildingTypeCoefficients.types).forEach(([key, value]) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>${key}</td>
+          <td><input type="text" value="${value.name}" data-key="${key}" data-field="name" class="type-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.01" value="${value.coefficient}" data-key="${key}" data-field="coefficient" class="type-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+        `;
+      });
+    }
+
+    // 渲染层高系数表
+    function renderHeightTable() {
+      const tbody = document.getElementById('heightTableBody');
+      tbody.innerHTML = '';
+      
+      config.heightCoefficients.ranges.forEach((range, index) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td><input type="text" value="${range.name}" data-index="${index}" data-field="name" class="height-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" value="${range.minFloors}" data-index="${index}" data-field="minFloors" class="height-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" value="${range.maxFloors}" data-index="${index}" data-field="maxFloors" class="height-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.01" value="${range.coefficient}" data-index="${index}" data-field="coefficient" class="height-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+        `;
+      });
+    }
+
+    // 渲染空调类型系数表
+    function renderAcTable() {
+      const tbody = document.getElementById('acTableBody');
+      tbody.innerHTML = '';
+      
+      Object.entries(config.airConditioningTypes).forEach(([key, value]) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>${key}</td>
+          <td><input type="text" value="${value.name}" data-key="${key}" data-field="name" class="ac-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.000001" value="${value.coefficients.arch}" data-key="${key}" data-dept="arch" class="ac-coef-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.000001" value="${value.coefficients.structure}" data-key="${key}" data-dept="structure" class="ac-coef-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.000001" value="${value.coefficients.water}" data-key="${key}" data-dept="water" class="ac-coef-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.000001" value="${value.coefficients.electric}" data-key="${key}" data-dept="electric" class="ac-coef-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+          <td><input type="number" step="0.000001" value="${value.coefficients.hvac}" data-key="${key}" data-dept="hvac" class="ac-coef-input" style="width:100%;border:1px solid #d9d9d9;padding:4px;border-radius:4px;" /></td>
+        `;
+      });
+    }
+
+    // 保存基础参数
+    async function saveBaseParameters() {
+      try {
+        const basePrice = parseFloat(document.getElementById('basePrice').value);
+        const commissionRatio = parseFloat(document.getElementById('commissionRatio').value);
+
+        const response = await fetch(`${API_BASE}/config/base-parameters`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ basePrice, commissionRatio })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        const chief = parseFloat(document.getElementById('chiefRatio').value);
+        const departments = parseFloat(document.getElementById('departmentsRatio').value);
+
+        const response2 = await fetch(`${API_BASE}/config/chief-allocation`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ chief, departments })
+        });
+
+        if (!response2.ok) throw new Error('保存总负责分配失败');
+
+        showMessage('基础参数保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 保存阶段分配
+    async function saveStageAllocation() {
+      try {
+        const scheme = parseFloat(document.getElementById('schemeRatio').value);
+        const construction = parseFloat(document.getElementById('constructionRatio').value);
+
+        const response = await fetch(`${API_BASE}/config/stage-allocation`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ scheme, construction })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        showMessage('阶段分配保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 保存项目规模系数
+    async function saveScaleCoefficients() {
+      try {
+        const inputs = document.querySelectorAll('.scale-input');
+        const ranges = [];
+        
+        const rangeCount = config.scaleCoefficients.ranges.length;
+        for (let i = 0; i < rangeCount; i++) {
+          const range = {};
+          inputs.forEach(input => {
+            if (parseInt(input.dataset.index) === i) {
+              const field = input.dataset.field;
+              range[field] = field === 'name' ? input.value : parseFloat(input.value);
+            }
+          });
+          ranges.push(range);
+        }
+
+        const response = await fetch(`${API_BASE}/config/scale-coefficients`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ ranges })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        showMessage('项目规模系数保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 保存建筑类型系数
+    async function saveBuildingTypeCoefficients() {
+      try {
+        const inputs = document.querySelectorAll('.type-input');
+        const types = {};
+        
+        inputs.forEach(input => {
+          const key = input.dataset.key;
+          const field = input.dataset.field;
+          
+          if (!types[key]) {
+            types[key] = {};
+          }
+          
+          types[key][field] = field === 'name' ? input.value : parseFloat(input.value);
+        });
+
+        const response = await fetch(`${API_BASE}/config/building-type-coefficients`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ types })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        showMessage('建筑类型系数保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 保存层高系数
+    async function saveHeightCoefficients() {
+      try {
+        const inputs = document.querySelectorAll('.height-input');
+        const ranges = [];
+        
+        const rangeCount = config.heightCoefficients.ranges.length;
+        for (let i = 0; i < rangeCount; i++) {
+          const range = {};
+          inputs.forEach(input => {
+            if (parseInt(input.dataset.index) === i) {
+              const field = input.dataset.field;
+              range[field] = field === 'name' ? input.value : parseFloat(input.value);
+            }
+          });
+          ranges.push(range);
+        }
+
+        const response = await fetch(`${API_BASE}/config/height-coefficients`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ ranges })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        showMessage('层高系数保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 保存空调类型系数
+    async function saveAirConditioningTypes() {
+      try {
+        const nameInputs = document.querySelectorAll('.ac-input');
+        const coefInputs = document.querySelectorAll('.ac-coef-input');
+        const airConditioningTypes = {};
+        
+        nameInputs.forEach(input => {
+          const key = input.dataset.key;
+          if (!airConditioningTypes[key]) {
+            airConditioningTypes[key] = {
+              name: input.value,
+              coefficients: {}
+            };
+          } else {
+            airConditioningTypes[key].name = input.value;
+          }
+        });
+
+        coefInputs.forEach(input => {
+          const key = input.dataset.key;
+          const dept = input.dataset.dept;
+          
+          if (!airConditioningTypes[key]) {
+            airConditioningTypes[key] = { coefficients: {} };
+          }
+          
+          airConditioningTypes[key].coefficients[dept] = parseFloat(input.value);
+        });
+
+        const response = await fetch(`${API_BASE}/config/air-conditioning-types`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ airConditioningTypes })
+        });
+
+        if (!response.ok) throw new Error('保存失败');
+
+        showMessage('空调类型系数保存成功');
+        loadConfig();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 页面加载时加载配置
+    loadConfig();
+  </script>
+</body>
+</html>

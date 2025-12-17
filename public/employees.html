@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>员工管理 - 绩效提成管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      padding: 10px 20px;
+      background: #52c41a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-home:hover {
+      background: #73d13d;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .search-box input,
+    .search-box select {
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-box input {
+      flex: 1;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #1890ff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .btn-danger {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #ff7875;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-admin {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .badge-finance {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+
+    .badge-manager {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+
+    .badge-employee {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #52c41a;
+    }
+
+    .message.error {
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      color: #ff4d4f;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #1890ff;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>员工管理</h1>
+      <a href="/index.html" class="btn-home">🏠 返回首页</a>
+    </div>
+    <p class="subtitle" id="subtitle">管理公司员工信息</p>
+
+    <div id="message" class="message"></div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索员工姓名或用户名..." />
+        <select id="departmentFilter">
+          <option value="">全部部门</option>
+        </select>
+        <select id="roleFilter">
+          <option value="">全部角色</option>
+          <option value="admin">管理员</option>
+          <option value="finance">财务</option>
+          <option value="manager">部门经理</option>
+          <option value="employee">员工</option>
+        </select>
+        <button class="btn btn-secondary" onclick="searchEmployees()">搜索</button>
+      </div>
+      <button class="btn btn-primary" onclick="showAddModal()" id="addButton">添加员工</button>
+    </div>
+
+    <div id="tableContainer">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+
+  <!-- 添加/编辑员工模态框 -->
+  <div id="employeeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle">添加员工</div>
+      <form id="employeeForm">
+        <input type="hidden" id="employeeId" />
+        
+        <div class="form-group">
+          <label>用户名 *</label>
+          <input type="text" id="username" required />
+        </div>
+
+        <div class="form-group" id="passwordGroup">
+          <label>密码 *</label>
+          <input type="password" id="password" />
+        </div>
+
+        <div class="form-group">
+          <label>姓名 *</label>
+          <input type="text" id="name" required />
+        </div>
+
+        <div class="form-group">
+          <label>角色 *</label>
+          <select id="role" required>
+            <option value="employee">员工</option>
+            <option value="manager">部门经理</option>
+            <option value="finance">财务</option>
+            <option value="admin">管理员</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>部门</label>
+          <select id="department">
+            <option value="">无</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="email" />
+        </div>
+
+        <div class="form-group">
+          <label>电话</label>
+          <input type="tel" id="phone" />
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let token = localStorage.getItem('token');
+    let currentUser = null;
+    let employees = [];
+    let departments = [];
+
+    // 检查登录状态
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // 获取当前用户信息
+    async function getCurrentUser() {
+      try {
+        const response = await fetch(`${API_BASE}/users/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('获取用户信息失败');
+        
+        const data = await response.json();
+        currentUser = data.user;
+        
+        // 根据角色调整界面
+        if (currentUser.role === 'manager') {
+          document.getElementById('subtitle').textContent = '管理本部门员工信息';
+          document.getElementById('addButton').textContent = '添加部门员工';
+        } else if (currentUser.role === 'employee') {
+          // 普通员工不应该访问此页面
+          showMessage('您没有权限访问此页面', 'error');
+          setTimeout(() => window.location.href = '/login.html', 2000);
+        }
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 显示消息
+    function showMessage(message, type = 'success') {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = message;
+      messageEl.className = `message ${type} show`;
+      setTimeout(() => {
+        messageEl.classList.remove('show');
+      }, 3000);
+    }
+
+    // 加载部门列表
+    async function loadDepartments() {
+      try {
+        const response = await fetch(`${API_BASE}/users/departments`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载部门失败');
+        
+        const data = await response.json();
+        departments = data.departments;
+        
+        // 填充部门下拉框
+        const departmentFilter = document.getElementById('departmentFilter');
+        const departmentSelect = document.getElementById('department');
+        
+        departments.forEach(dept => {
+          const option1 = document.createElement('option');
+          option1.value = dept.id;
+          option1.textContent = dept.name;
+          departmentFilter.appendChild(option1);
+          
+          const option2 = document.createElement('option');
+          option2.value = dept.id;
+          option2.textContent = dept.name;
+          departmentSelect.appendChild(option2);
+        });
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 加载员工列表
+    async function loadEmployees() {
+      try {
+        const response = await fetch(`${API_BASE}/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载员工失败');
+        
+        const data = await response.json();
+        employees = data.users;
+        
+        renderEmployees(employees);
+      } catch (error) {
+        showMessage(error.message, 'error');
+        document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div>加载失败</div></div>';
+      }
+    }
+
+    // 渲染员工列表
+    function renderEmployees(data) {
+      const container = document.getElementById('tableContainer');
+      
+      if (data.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div>暂无员工数据</div></div>';
+        return;
+      }
+      
+      const roleNames = {
+        'admin': '管理员',
+        'finance': '财务',
+        'manager': '部门经理',
+        'employee': '员工'
+      };
+      
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>用户名</th>
+              <th>姓名</th>
+              <th>角色</th>
+              <th>部门</th>
+              <th>邮箱</th>
+              <th>电话</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.forEach(emp => {
+        html += `
+          <tr>
+            <td>${emp.username}</td>
+            <td>${emp.name}</td>
+            <td><span class="badge badge-${emp.role}">${roleNames[emp.role]}</span></td>
+            <td>${emp.department_name || '-'}</td>
+            <td>${emp.email || '-'}</td>
+            <td>${emp.phone || '-'}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-secondary btn-small" onclick="editEmployee(${emp.id})">编辑</button>
+                ${emp.id !== currentUser.id ? `<button class="btn btn-danger btn-small" onclick="deleteEmployee(${emp.id}, '${emp.name}')">删除</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // 搜索员工
+    function searchEmployees() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const departmentId = document.getElementById('departmentFilter').value;
+      const role = document.getElementById('roleFilter').value;
+      
+      let filtered = employees;
+      
+      if (searchText) {
+        filtered = filtered.filter(emp => 
+          emp.name.toLowerCase().includes(searchText) || 
+          emp.username.toLowerCase().includes(searchText)
+        );
+      }
+      
+      if (departmentId) {
+        filtered = filtered.filter(emp => emp.department_id == departmentId);
+      }
+      
+      if (role) {
+        filtered = filtered.filter(emp => emp.role === role);
+      }
+      
+      renderEmployees(filtered);
+    }
+
+    // 显示添加模态框
+    function showAddModal() {
+      document.getElementById('modalTitle').textContent = '添加员工';
+      document.getElementById('employeeForm').reset();
+      document.getElementById('employeeId').value = '';
+      document.getElementById('passwordGroup').style.display = 'block';
+      document.getElementById('password').required = true;
+      document.getElementById('employeeModal').classList.add('show');
+    }
+
+    // 编辑员工
+    function editEmployee(id) {
+      const emp = employees.find(e => e.id === id);
+      if (!emp) return;
+      
+      document.getElementById('modalTitle').textContent = '编辑员工';
+      document.getElementById('employeeId').value = emp.id;
+      document.getElementById('username').value = emp.username;
+      document.getElementById('name').value = emp.name;
+      document.getElementById('role').value = emp.role;
+      document.getElementById('department').value = emp.department_id || '';
+      document.getElementById('email').value = emp.email || '';
+      document.getElementById('phone').value = emp.phone || '';
+      document.getElementById('passwordGroup').style.display = 'none';
+      document.getElementById('password').required = false;
+      
+      document.getElementById('employeeModal').classList.add('show');
+    }
+
+    // 关闭模态框
+    function closeModal() {
+      document.getElementById('employeeModal').classList.remove('show');
+    }
+
+    // 删除员工
+    async function deleteEmployee(id, name) {
+      if (!confirm(`确定要删除员工"${name}"吗？`)) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/users/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('删除失败');
+        
+        showMessage('员工删除成功');
+        loadEmployees();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    // 提交表单
+    document.getElementById('employeeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('employeeId').value;
+      const data = {
+        username: document.getElementById('username').value,
+        name: document.getElementById('name').value,
+        role: document.getElementById('role').value,
+        department_id: document.getElementById('department').value || null,
+        email: document.getElementById('email').value || null,
+        phone: document.getElementById('phone').value || null
+      };
+      
+      if (!id) {
+        data.password = document.getElementById('password').value;
+      }
+      
+      try {
+        const url = id ? `${API_BASE}/users/${id}` : `${API_BASE}/users`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '操作失败');
+        }
+        
+        showMessage(id ? '员工更新成功' : '员工添加成功');
+        closeModal();
+        loadEmployees();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    });
+
+    // 页面加载时初始化
+    async function initPage() {
+      try {
+        // 先获取当前用户信息
+        await getCurrentUser();
+        // 然后并行加载部门和员工数据
+        await Promise.all([
+          loadDepartments(),
+          loadEmployees()
+        ]);
+      } catch (error) {
+        console.error('页面初始化失败:', error);
+        showMessage('页面加载失败,请刷新重试', 'error');
+      }
+    }
+    
+    initPage();
+  </script>
+</body>
+</html>

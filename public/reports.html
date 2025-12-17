@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发放汇总 - 绩效提成管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      padding: 10px 20px;
+      background: #52c41a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-home:hover {
+      background: #73d13d;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e8e8e8;
+      margin-bottom: 30px;
+      gap: 10px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 15px;
+      color: #666;
+      transition: all 0.3s;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab:hover {
+      color: #1890ff;
+    }
+
+    .tab.active {
+      color: #1890ff;
+      border-bottom-color: #1890ff;
+      font-weight: 500;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .toolbar select {
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #1890ff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .amount-cell {
+      font-weight: 500;
+      color: #1890ff;
+      font-size: 15px;
+    }
+
+    .summary-row {
+      background: #fafafa;
+      font-weight: 500;
+    }
+
+    .summary-row td {
+      border-top: 2px solid #d9d9d9;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #52c41a;
+    }
+
+    .message.error {
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      color: #ff4d4f;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .highlight-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .highlight-title {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .highlight-value {
+      font-size: 36px;
+      font-weight: 600;
+    }
+
+    .highlight-unit {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-left: 8px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 500;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>发放汇总报表</h1>
+      <a href="/index.html" class="btn-home">🏠 返回首页</a>
+    </div>
+    <p class="subtitle">查看员工和部门的提成发放汇总</p>
+
+    <div id="message" class="message"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('department')">部门汇总</button>
+      <button class="tab" onclick="switchTab('employee')">员工汇总</button>
+      <button class="tab" onclick="switchTab('all-departments')">全部门对比</button>
+    </div>
+
+    <!-- 部门汇总 -->
+    <div id="tab-department" class="tab-content active">
+      <div class="toolbar">
+        <label>选择部门：</label>
+        <select id="departmentSelect"></select>
+        <label>选择期间：</label>
+        <select id="departmentPeriodSelect">
+          <option value="">全部期间</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadDepartmentSummary()">查询</button>
+      </div>
+      <div id="departmentContent">
+        <div class="loading">请选择部门查询</div>
+      </div>
+    </div>
+
+    <!-- 员工汇总 -->
+    <div id="tab-employee" class="tab-content">
+      <div class="toolbar">
+        <label>选择员工：</label>
+        <select id="employeeSelect"></select>
+        <label>选择期间：</label>
+        <select id="employeePeriodSelect">
+          <option value="">全部期间</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadEmployeeSummary()">查询</button>
+      </div>
+      <div id="employeeContent">
+        <div class="loading">请选择员工查询</div>
+      </div>
+    </div>
+
+    <!-- 全部门对比 -->
+    <div id="tab-all-departments" class="tab-content">
+      <div class="toolbar">
+        <label>选择期间：</label>
+        <select id="allDepartmentsPeriodSelect">
+          <option value="">全部期间</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadAllDepartmentsSummary()">查询</button>
+      </div>
+      <div id="allDepartmentsContent">
+        <div class="loading">点击查询按钮加载数据</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let token = localStorage.getItem('token');
+    let currentUser = null;
+
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    function showMessage(message, type = 'success') {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = message;
+      messageEl.className = `message ${type} show`;
+      setTimeout(() => messageEl.classList.remove('show'), 3000);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    async function getCurrentUser() {
+      try {
+        const response = await fetch(`${API_BASE}/users/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('获取用户信息失败');
+        
+        const data = await response.json();
+        currentUser = data.user;
+        
+        // 部门经理只能看自己的部门
+        if (currentUser.role === 'manager' && currentUser.department_id) {
+          document.getElementById('departmentSelect').value = currentUser.department_id;
+          document.getElementById('departmentSelect').disabled = true;
+          loadDepartmentSummary();
+        }
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function loadDepartments() {
+      try {
+        const response = await fetch(`${API_BASE}/users/departments`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载部门失败');
+        
+        const data = await response.json();
+        const select = document.getElementById('departmentSelect');
+        
+        data.departments.forEach(dept => {
+          const option = document.createElement('option');
+          option.value = dept.id;
+          option.textContent = dept.name;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function loadEmployees() {
+      try {
+        const response = await fetch(`${API_BASE}/users`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载员工失败');
+        
+        const data = await response.json();
+        const select = document.getElementById('employeeSelect');
+        
+        data.users.forEach(emp => {
+          const option = document.createElement('option');
+          option.value = emp.id;
+          option.textContent = `${emp.name} (${emp.department_name || '无部门'})`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function loadPeriods() {
+      try {
+        const response = await fetch(`${API_BASE}/projects`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载期间失败');
+        
+        const data = await response.json();
+        const periods = [...new Set(data.projects.map(p => p.period).filter(p => p))];
+        
+        [document.getElementById('departmentPeriodSelect'),
+         document.getElementById('employeePeriodSelect'),
+         document.getElementById('allDepartmentsPeriodSelect')].forEach(select => {
+          periods.forEach(period => {
+            const option = document.createElement('option');
+            option.value = period;
+            option.textContent = period;
+            select.appendChild(option);
+          });
+        });
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function loadDepartmentSummary() {
+      const departmentId = document.getElementById('departmentSelect').value;
+      const period = document.getElementById('departmentPeriodSelect').value;
+      
+      if (!departmentId) {
+        showMessage('请选择部门', 'error');
+        return;
+      }
+      
+      const container = document.getElementById('departmentContent');
+      container.innerHTML = '<div class="loading">加载中...</div>';
+      
+      try {
+        let url = `${API_BASE}/payment/summary/department/${departmentId}`;
+        if (period) url += `?period=${period}`;
+        
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载失败');
+        
+        const data = await response.json();
+        renderDepartmentSummary(data);
+      } catch (error) {
+        showMessage(error.message, 'error');
+        container.innerHTML = '<div class="empty-state">加载失败</div>';
+      }
+    }
+
+    function renderDepartmentSummary(data) {
+      const container = document.getElementById('departmentContent');
+      
+      if (data.employees.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;">📊</div><div>该部门暂无发放记录</div></div>';
+        return;
+      }
+      
+      let html = `
+        <div class="highlight-card">
+          <div class="highlight-title">部门发放总额 (${data.period})</div>
+          <div class="highlight-value">${data.summary.grandTotal.toLocaleString()}<span class="highlight-unit">元</span></div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">员工人数</div>
+            <div class="stat-value">${data.summary.employeeCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">涉及项目</div>
+            <div class="stat-value">${data.summary.projectCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">人均发放</div>
+            <div class="stat-value">${Math.round(data.summary.grandTotal / data.summary.employeeCount).toLocaleString()}</div>
+          </div>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>员工姓名</th>
+              <th>用户名</th>
+              <th>发放总额（元）</th>
+              <th>涉及项目数</th>
+              <th>发放次数</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.employees.forEach(emp => {
+        html += `
+          <tr>
+            <td>${emp.user_name}</td>
+            <td>${emp.username}</td>
+            <td class="amount-cell">${emp.total_amount.toLocaleString()}</td>
+            <td>${emp.project_count}</td>
+            <td>${emp.payment_count}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          <tr class="summary-row">
+            <td colspan="2">合计</td>
+            <td class="amount-cell">${data.summary.grandTotal.toLocaleString()}</td>
+            <td>${data.summary.projectCount}</td>
+            <td>-</td>
+          </tr>
+        </tbody>
+      </table>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    async function loadEmployeeSummary() {
+      const userId = document.getElementById('employeeSelect').value;
+      const period = document.getElementById('employeePeriodSelect').value;
+      
+      if (!userId) {
+        showMessage('请选择员工', 'error');
+        return;
+      }
+      
+      const container = document.getElementById('employeeContent');
+      container.innerHTML = '<div class="loading">加载中...</div>';
+      
+      try {
+        let url = `${API_BASE}/payment/summary/employee/${userId}`;
+        if (period) url += `?period=${period}`;
+        
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载失败');
+        
+        const data = await response.json();
+        renderEmployeeSummary(data);
+      } catch (error) {
+        showMessage(error.message, 'error');
+        container.innerHTML = '<div class="empty-state">加载失败</div>';
+      }
+    }
+
+    function renderEmployeeSummary(data) {
+      const container = document.getElementById('employeeContent');
+      
+      if (data.projects.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;">📊</div><div>该员工暂无发放记录</div></div>';
+        return;
+      }
+      
+      let html = `
+        <div class="highlight-card">
+          <div class="highlight-title">员工发放总额 (${data.period})</div>
+          <div class="highlight-value">${data.summary.grandTotal.toLocaleString()}<span class="highlight-unit">元</span></div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">涉及项目</div>
+            <div class="stat-value">${data.summary.projectCount}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">发放次数</div>
+            <div class="stat-value">${data.summary.totalPayments}</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">项目平均</div>
+            <div class="stat-value">${Math.round(data.summary.grandTotal / data.summary.projectCount).toLocaleString()}</div>
+          </div>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>项目编号</th>
+              <th>项目名称</th>
+              <th>期间</th>
+              <th>发放总额（元）</th>
+              <th>发放次数</th>
+              <th>首次发放</th>
+              <th>最后发放</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.projects.forEach(proj => {
+        html += `
+          <tr>
+            <td>${proj.project_code}</td>
+            <td>${proj.project_name}</td>
+            <td>${proj.period || '-'}</td>
+            <td class="amount-cell">${proj.total_amount.toLocaleString()}</td>
+            <td>${proj.payment_count}</td>
+            <td>${proj.first_payment_date}</td>
+            <td>${proj.last_payment_date}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          <tr class="summary-row">
+            <td colspan="3">合计</td>
+            <td class="amount-cell">${data.summary.grandTotal.toLocaleString()}</td>
+            <td>${data.summary.totalPayments}</td>
+            <td colspan="2">-</td>
+          </tr>
+        </tbody>
+      </table>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    async function loadAllDepartmentsSummary() {
+      const period = document.getElementById('allDepartmentsPeriodSelect').value;
+      const container = document.getElementById('allDepartmentsContent');
+      container.innerHTML = '<div class="loading">加载中...</div>';
+      
+      try {
+        let url = `${API_BASE}/payment/summary/all-departments`;
+        if (period) url += `?period=${period}`;
+        
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载失败');
+        
+        const data = await response.json();
+        renderAllDepartmentsSummary(data);
+      } catch (error) {
+        showMessage(error.message, 'error');
+        container.innerHTML = '<div class="empty-state">加载失败</div>';
+      }
+    }
+
+    function renderAllDepartmentsSummary(data) {
+      const container = document.getElementById('allDepartmentsContent');
+      
+      if (data.departments.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;">📊</div><div>暂无发放记录</div></div>';
+        return;
+      }
+      
+      const grandTotal = data.departments.reduce((sum, d) => sum + d.total_amount, 0);
+      const totalEmployees = data.departments.reduce((sum, d) => sum + d.employee_count, 0);
+      
+      let html = `
+        <div class="highlight-card">
+          <div class="highlight-title">全公司发放总额 (${data.period})</div>
+          <div class="highlight-value">${grandTotal.toLocaleString()}<span class="highlight-unit">元</span></div>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>部门名称</th>
+              <th>发放总额（元）</th>
+              <th>占比</th>
+              <th>员工人数</th>
+              <th>涉及项目</th>
+              <th>人均发放（元）</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.departments.forEach(dept => {
+        const percentage = ((dept.total_amount / grandTotal) * 100).toFixed(1);
+        const avgPerEmployee = dept.employee_count > 0 ? Math.round(dept.total_amount / dept.employee_count) : 0;
+        
+        html += `
+          <tr>
+            <td>${dept.department_name}</td>
+            <td class="amount-cell">${dept.total_amount.toLocaleString()}</td>
+            <td>${percentage}%</td>
+            <td>${dept.employee_count}</td>
+            <td>${dept.project_count}</td>
+            <td>${avgPerEmployee.toLocaleString()}</td>
+          </tr>
+        `;
+      });
+      
+      html += `
+          <tr class="summary-row">
+            <td>合计</td>
+            <td class="amount-cell">${grandTotal.toLocaleString()}</td>
+            <td>100%</td>
+            <td>${totalEmployees}</td>
+            <td>-</td>
+            <td>${Math.round(grandTotal / totalEmployees).toLocaleString()}</td>
+          </tr>
+        </tbody>
+      </table>
+      `;
+      
+      container.innerHTML = html;
+    }
+
+    // 页面初始化
+    async function initPage() {
+      try {
+        // 先获取当前用户信息
+        await getCurrentUser();
+        // 然后并行加载其他数据
+        await Promise.all([
+          loadDepartments(),
+          loadEmployees(),
+          loadPeriods()
+        ]);
+      } catch (error) {
+        console.error('页面初始化失败:', error);
+        showMessage('页面加载失败,请刷新重试', 'error');
+      }
+    }
+    
+    initPage();
+  </script>
+</body>
+</html>

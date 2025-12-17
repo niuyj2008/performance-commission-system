@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目管理 - 绩效提成管理系统</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .btn-home {
+      padding: 10px 20px;
+      background: #52c41a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-home:hover {
+      background: #73d13d;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      flex-wrap: wrap;
+    }
+
+    .filters select,
+    .filters input {
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #1890ff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-success {
+      background: #52c41a;
+      color: white;
+    }
+
+    .btn-warning {
+      background: #faad14;
+      color: white;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .btn-danger {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+
+    tr:hover {
+      background: #fafafa;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .message.success {
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #52c41a;
+    }
+
+    .message.error {
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      color: #ff4d4f;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 1200px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 30px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .commission-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+
+    .commission-detail {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .commission-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .breakdown-item {
+      background: white;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #e8e8e8;
+    }
+
+    .breakdown-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .breakdown-value {
+      font-size: 20px;
+      font-weight: 500;
+      color: #1890ff;
+    }
+
+    .participants-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .participant-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>项目管理</h1>
+      <a href="/index.html" class="btn-home">🏠 返回首页</a>
+    </div>
+    <p class="subtitle">创建项目、计算提成、分配参与人员</p>
+
+    <div id="message" class="message"></div>
+
+    <div class="toolbar">
+      <div class="filters">
+        <select id="periodFilter">
+          <option value="">全部期间</option>
+        </select>
+        <select id="stageFilter">
+          <option value="">全部阶段</option>
+          <option value="scheme">方案设计</option>
+          <option value="construction">施工图设计</option>
+          <option value="cooperation">合作项目</option>
+        </select>
+        <button class="btn btn-secondary" onclick="loadProjects()">查询</button>
+      </div>
+      <button id="createProjectBtn" class="btn btn-primary" onclick="showAddModal()" style="display: none;">创建项目</button>
+    </div>
+
+    <div id="tableContainer">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+
+  <!-- 创建/编辑项目模态框 -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle">创建项目</div>
+      <form id="projectForm">
+        <input type="hidden" id="projectId" />
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>项目编号 *</label>
+            <input type="text" id="code" required />
+          </div>
+          <div class="form-group">
+            <label>项目名称 *</label>
+            <input type="text" id="name" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>设计阶段</label>
+            <select id="stage">
+              <option value="scheme">方案设计</option>
+              <option value="construction" selected>施工图设计</option>
+              <option value="cooperation">合作项目</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>建筑类型</label>
+            <select id="buildingType">
+              <option value="office">办公建筑</option>
+              <option value="residential">住宅建筑</option>
+              <option value="school">学校建筑</option>
+              <option value="commercial">商业建筑</option>
+              <option value="industrial">工业建筑</option>
+              <option value="other" selected>其他</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>建筑面积（㎡）</label>
+            <input type="number" id="buildingArea" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>期间</label>
+            <input type="text" id="period" placeholder="例如：2025年上半年" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>项目属性</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div class="checkbox-group">
+              <input type="checkbox" id="hasBasement" />
+              <label for="hasBasement" style="margin: 0;">含地下室</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="hasCivilDefense" />
+              <label for="hasCivilDefense" style="margin: 0;">含人防</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isGreenBuilding" />
+              <label for="isGreenBuilding" style="margin: 0;">绿色建筑</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isPrefabricated" />
+              <label for="isPrefabricated" style="margin: 0;">装配式建筑</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isReportingProject" />
+              <label for="isReportingProject" style="margin: 0;">报建项目</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="isReviewProject" />
+              <label for="isReviewProject" style="margin: 0;">审图项目</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 空调面积表配置 -->
+        <div class="form-group" style="margin-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <label style="margin: 0;">空调面积表</label>
+            <button type="button" class="btn btn-small btn-primary" onclick="addAcRow()">+ 添加</button>
+          </div>
+          
+          <div style="overflow-x: auto; max-height: 300px; overflow-y: auto; border: 1px solid #e8e8e8; border-radius: 4px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead style="position: sticky; top: 0; background: #fafafa; z-index: 1;">
+                <tr>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e8e8e8; font-size: 13px;">序号</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e8e8e8; font-size: 13px;">空调形式 *</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e8e8e8; font-size: 13px;">采用空调部位</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e8e8e8; font-size: 13px;">空调面积（㎡）*</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e8e8e8; font-size: 13px;">备注</th>
+                  <th style="padding: 10px; text-align: center; border-bottom: 2px solid #e8e8e8; font-size: 13px; width: 80px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="acTableBody">
+                <tr>
+                  <td colspan="6" style="padding: 30px; text-align: center; color: #999; font-size: 13px;">
+                    暂无数据，点击"+ 添加"按钮添加空调面积记录
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 提成计算模态框 -->
+  <div id="commissionModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">提成计算结果</div>
+      <div id="commissionContent"></div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" onclick="closeCommissionModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let token = localStorage.getItem('token');
+    let projects = [];
+    let acTableData = []; // 空调面积表数据
+    let currentUser = null; // 当前用户信息
+
+    // 空调类型选项（基于权威文档）
+    const acTypes = [
+      '没有空调',
+      '全中央空调',
+      'VRV空调（布管）',
+      'VRV空调（不布管）',
+      '分体空调及消防排烟',
+      '仅有分体空调',
+      '仅有消防排烟',
+      '地下室通风及消防排烟'
+    ];
+
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // 获取当前用户信息
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch(`${API_BASE}/users/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          currentUser = data.user;
+          
+          // 根据用户角色显示/隐藏创建项目按钮
+          const createBtn = document.getElementById('createProjectBtn');
+          if (currentUser.role === 'admin' || currentUser.role === 'finance') {
+            createBtn.style.display = 'block';
+          }
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+      }
+    }
+
+    function showMessage(message, type = 'success') {
+      const messageEl = document.getElementById('message');
+      messageEl.textContent = message;
+      messageEl.className = `message ${type} show`;
+      setTimeout(() => messageEl.classList.remove('show'), 3000);
+    }
+
+    async function loadProjects() {
+      try {
+        const period = document.getElementById('periodFilter').value;
+        const stage = document.getElementById('stageFilter').value;
+        
+        let url = `${API_BASE}/projects?`;
+        if (period) url += `period=${period}&`;
+        if (stage) url += `stage=${stage}&`;
+        
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('加载项目失败');
+        
+        const data = await response.json();
+        projects = data.projects;
+        
+        // 提取唯一的期间
+        const periods = [...new Set(projects.map(p => p.period).filter(p => p))];
+        const periodFilter = document.getElementById('periodFilter');
+        periodFilter.innerHTML = '<option value="">全部期间</option>';
+        periods.forEach(period => {
+          const option = document.createElement('option');
+          option.value = period;
+          option.textContent = period;
+          periodFilter.appendChild(option);
+        });
+        
+        renderProjects(projects);
+      } catch (error) {
+        showMessage(error.message, 'error');
+        document.getElementById('tableContainer').innerHTML = '<div class="empty-state">加载失败</div>';
+      }
+    }
+
+    function renderProjects(data) {
+      const container = document.getElementById('tableContainer');
+      
+      if (data.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:16px;">📁</div><div>暂无项目数据</div></div>';
+        return;
+      }
+      
+      const stageNames = {
+        'scheme': '方案设计',
+        'construction': '施工图设计',
+        'cooperation': '合作项目'
+      };
+      
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>项目编号</th>
+              <th>项目名称</th>
+              <th>设计阶段</th>
+              <th>建筑面积</th>
+              <th>期间</th>
+              <th>计算提成</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.forEach(proj => {
+        const commission = proj.calculated_commission ? 
+          `<span class="commission-badge">¥${proj.calculated_commission.toLocaleString()}</span>` : 
+          '<span style="color:#999;">未计算</span>';
+        
+        // 根据用户角色决定显示哪些按钮
+        const isAdminOrFinance = currentUser && (currentUser.role === 'admin' || currentUser.role === 'finance');
+        
+        html += `
+          <tr>
+            <td>${proj.code}</td>
+            <td>${proj.name}</td>
+            <td>${stageNames[proj.stage] || '-'}</td>
+            <td>${proj.building_area ? proj.building_area.toLocaleString() + ' ㎡' : '-'}</td>
+            <td>${proj.period || '-'}</td>
+            <td>${commission}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-primary btn-small" onclick="viewDetail(${proj.id})">查看详情</button>
+                ${isAdminOrFinance ? `<button class="btn btn-success btn-small" onclick="calculateCommission(${proj.id})">计算提成</button>` : ''}
+                ${isAdminOrFinance ? `<button class="btn btn-secondary btn-small" onclick="editProject(${proj.id})">编辑</button>` : ''}
+                ${isAdminOrFinance ? `<button class="btn btn-danger btn-small" onclick="deleteProject(${proj.id}, '${proj.name}')">删除</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function showAddModal() {
+      document.getElementById('modalTitle').textContent = '创建项目';
+      document.getElementById('projectForm').reset();
+      document.getElementById('projectId').value = '';
+      
+      // 清空空调面积表
+      acTableData = [];
+      renderAcTable();
+      
+      document.getElementById('projectModal').classList.add('show');
+    }
+
+    async function editProject(id) {
+      const proj = projects.find(p => p.id === id);
+      if (!proj) return;
+      
+      document.getElementById('modalTitle').textContent = '编辑项目';
+      document.getElementById('projectId').value = proj.id;
+      document.getElementById('code').value = proj.code;
+      document.getElementById('name').value = proj.name;
+      document.getElementById('stage').value = proj.stage || 'construction';
+      document.getElementById('buildingType').value = proj.building_type || 'other';
+      document.getElementById('buildingArea').value = proj.building_area || '';
+      document.getElementById('period').value = proj.period || '';
+      document.getElementById('hasBasement').checked = proj.has_basement === 1;
+      document.getElementById('hasCivilDefense').checked = proj.has_civil_defense === 1;
+      document.getElementById('isGreenBuilding').checked = proj.is_green_building === 1;
+      document.getElementById('isPrefabricated').checked = proj.is_prefabricated === 1;
+      document.getElementById('isReportingProject').checked = proj.is_reporting_project === 1;
+      document.getElementById('isReviewProject').checked = proj.is_review_project === 1;
+      
+      // 加载空调面积表
+      try {
+        const response = await fetch(`${API_BASE}/air-conditioning/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          acTableData = data.tables || [];
+        } else {
+          acTableData = [];
+        }
+      } catch (error) {
+        console.error('加载空调面积表失败:', error);
+        acTableData = [];
+      }
+      
+      renderAcTable();
+      
+      document.getElementById('projectModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('projectModal').classList.remove('show');
+    }
+
+    function closeCommissionModal() {
+      document.getElementById('commissionModal').classList.remove('show');
+    }
+
+    async function deleteProject(id, name) {
+      if (!confirm(`确定要删除项目"${name}"吗？`)) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/projects/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) throw new Error('删除失败');
+        
+        showMessage('项目删除成功');
+        loadProjects();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    async function calculateCommission(projectId) {
+      try {
+        const response = await fetch(`${API_BASE}/commission/calculate/${projectId}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '计算失败');
+        }
+        
+        const data = await response.json();
+        displayCommissionResult(data);
+        loadProjects(); // 刷新列表
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    }
+
+    function viewDetail(projectId) {
+      window.location.href = `/project-detail.html?id=${projectId}`;
+    }
+
+    function displayCommissionResult(data) {
+      const content = document.getElementById('commissionContent');
+      
+      let html = `
+        <div class="commission-detail">
+          <h3 style="margin-bottom: 15px; color: #333;">${data.projectName}</h3>
+          <div style="font-size: 32px; font-weight: 600; color: #1890ff; margin-bottom: 20px;">
+            总提成：¥${data.totalCommission.toLocaleString()}
+          </div>
+          
+          <div class="commission-breakdown">
+            <div class="breakdown-item">
+              <div class="breakdown-label">设计费提成</div>
+              <div class="breakdown-value">¥${data.breakdown.designFeeCommission.toLocaleString()}</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-label">空调面积提成</div>
+              <div class="breakdown-value">¥${data.breakdown.airConditioningCommission.toLocaleString()}</div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px; padding: 15px; background: #f0f5ff; border-radius: 6px;">
+            <h4 style="margin-bottom: 10px; color: #1890ff;">计算明细</h4>
+            <div style="font-size: 13px; color: #666; line-height: 1.8;">
+              <div>设计费单价：¥${data.breakdown.designFeeUnitPrice}/㎡</div>
+              <div>设计费提成比例：${(data.breakdown.designFeeCommissionRate * 100).toFixed(1)}%</div>
+              <div>空调面积：${data.breakdown.airConditioningArea.toLocaleString()} ㎡</div>
+              <div>空调面积单价：¥${data.breakdown.airConditioningUnitPrice}/㎡</div>
+              <div>空调面积提成比例：${(data.breakdown.airConditioningCommissionRate * 100).toFixed(1)}%</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+      document.getElementById('commissionModal').classList.add('show');
+    }
+
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('projectId').value;
+      const data = {
+        code: document.getElementById('code').value,
+        name: document.getElementById('name').value,
+        stage: document.getElementById('stage').value,
+        building_type: document.getElementById('buildingType').value,
+        building_area: parseFloat(document.getElementById('buildingArea').value) || null,
+        period: document.getElementById('period').value || null,
+        has_basement: document.getElementById('hasBasement').checked,
+        has_civil_defense: document.getElementById('hasCivilDefense').checked,
+        is_green_building: document.getElementById('isGreenBuilding').checked,
+        is_prefabricated: document.getElementById('isPrefabricated').checked,
+        is_reporting_project: document.getElementById('isReportingProject').checked,
+        is_review_project: document.getElementById('isReviewProject').checked
+      };
+      
+      try {
+        // 验证空调面积表数据
+        for (let i = 0; i < acTableData.length; i++) {
+          const row = acTableData[i];
+          if (!row.ac_type) {
+            alert(`空调面积表第 ${i + 1} 行：请选择空调形式`);
+            return;
+          }
+          if (!row.area || row.area <= 0) {
+            alert(`空调面积表第 ${i + 1} 行：请输入有效的空调面积`);
+            return;
+          }
+        }
+        
+        const url = id ? `${API_BASE}/projects/${id}` : `${API_BASE}/projects`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '操作失败');
+        }
+        
+        const result = await response.json();
+        const projectId = id || result.projectId;
+        
+        // 保存空调面积表（如果有数据）
+        if (acTableData.length > 0) {
+          const acResponse = await fetch(`${API_BASE}/air-conditioning/${projectId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ tables: acTableData })
+          });
+          
+          if (!acResponse.ok) {
+            console.error('保存空调面积表失败');
+            // 不阻止项目保存成功的提示
+          }
+        }
+        
+        showMessage(id ? '项目更新成功' : '项目创建成功');
+        closeModal();
+        loadProjects();
+      } catch (error) {
+        showMessage(error.message, 'error');
+      }
+    });
+
+    // 空调面积表管理函数
+    function renderAcTable() {
+      const tbody = document.getElementById('acTableBody');
+      
+      if (acTableData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="padding: 30px; text-align: center; color: #999; font-size: 13px;">
+              暂无数据，点击"+ 添加"按钮添加空调面积记录
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = acTableData.map((row, index) => `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">${index + 1}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">
+            <select class="form-control" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;" 
+                    data-index="${index}" data-field="ac_type">
+              ${acTypes.map(type => `
+                <option value="${type}" ${row.ac_type === type ? 'selected' : ''}>${type}</option>
+              `).join('')}
+            </select>
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">
+            <input type="text" class="form-control" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;"
+                   value="${row.location || ''}" 
+                   data-index="${index}" data-field="location" 
+                   placeholder="例如：1#产业用房1~2F" />
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">
+            <input type="number" class="form-control" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;"
+                   value="${row.area || ''}" 
+                   data-index="${index}" data-field="area" 
+                   placeholder="0" step="0.01" min="0" />
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">
+            <input type="text" class="form-control" style="width: 100%; padding: 6px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px;"
+                   value="${row.notes || ''}" 
+                   data-index="${index}" data-field="notes" 
+                   placeholder="备注" />
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #f0f0f0; text-align: center;">
+            <button type="button" class="btn btn-danger btn-small" onclick="deleteAcRow(${index})" 
+                    style="padding: 4px 10px; font-size: 12px;">删除</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 添加事件监听器
+      tbody.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const index = parseInt(e.target.dataset.index);
+          const field = e.target.dataset.field;
+          acTableData[index][field] = e.target.value;
+        });
+      });
+    }
+
+    function addAcRow() {
+      acTableData.push({
+        ac_type: '没有空调',
+        location: '',
+        area: 0,
+        notes: ''
+      });
+      renderAcTable();
+    }
+
+    function deleteAcRow(index) {
+      if (confirm('确定要删除这条记录吗？')) {
+        acTableData.splice(index, 1);
+        renderAcTable();
+      }
+    }
+
+    // 页面初始化
+    async function initPage() {
+      await loadCurrentUser();
+      await loadProjects();
+    }
+    
+    initPage();
+  </script>
+</body>
+</html>

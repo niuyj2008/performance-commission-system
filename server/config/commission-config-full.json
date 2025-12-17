@@ -1,0 +1,307 @@
+{
+  "version": "2.0.0",
+  "description": "完整的提成计算配置 - 基于韶谷数码城项目奖金发放计算表(20200629)",
+  "lastUpdated": "2025-12-14",
+  
+  "baseParameters": {
+    "description": "基础计算参数",
+    "basePrice": 22,
+    "commissionRatio": 0.27
+  },
+  
+  "stageAllocation": {
+    "description": "阶段分配比例",
+    "scheme": 0.15,
+    "construction": 0.85
+  },
+  
+  "chiefAllocation": {
+    "description": "总负责分配比例（从施工图金额中分配）",
+    "chief": 0.07,
+    "departments": 0.93
+  },
+  
+  "scaleCoefficients": {
+    "description": "项目规模系数（根据建筑面积）",
+    "ranges": [
+      {
+        "name": "小型项目",
+        "minArea": 0,
+        "maxArea": 5000,
+        "coefficient": 1.0
+      },
+      {
+        "name": "中型项目",
+        "minArea": 5001,
+        "maxArea": 20000,
+        "coefficient": 1.15
+      },
+      {
+        "name": "大型项目",
+        "minArea": 20001,
+        "maxArea": 50000,
+        "coefficient": 1.25
+      },
+      {
+        "name": "超大型项目",
+        "minArea": 50001,
+        "maxArea": 999999,
+        "coefficient": 1.35
+      }
+    ]
+  },
+  
+  "buildingTypeCoefficients": {
+    "description": "工程类别系数",
+    "types": {
+      "office": {
+        "name": "办公楼",
+        "coefficient": 1.0
+      },
+      "residential": {
+        "name": "住宅",
+        "coefficient": 0.9
+      },
+      "school": {
+        "name": "学校",
+        "coefficient": 0.95
+      },
+      "commercial": {
+        "name": "商业",
+        "coefficient": 1.05
+      },
+      "industrial": {
+        "name": "工业",
+        "coefficient": 0.85
+      },
+      "other": {
+        "name": "其他",
+        "coefficient": 0.8
+      }
+    }
+  },
+  
+  "heightCoefficients": {
+    "description": "层高系数（根据楼层数）",
+    "ranges": [
+      {
+        "name": "低层建筑",
+        "minFloors": 1,
+        "maxFloors": 6,
+        "coefficient": 1.0
+      },
+      {
+        "name": "多层建筑",
+        "minFloors": 7,
+        "maxFloors": 12,
+        "coefficient": 1.1
+      },
+      {
+        "name": "高层建筑",
+        "minFloors": 13,
+        "maxFloors": 24,
+        "coefficient": 1.15
+      },
+      {
+        "name": "超高层建筑",
+        "minFloors": 25,
+        "maxFloors": 999,
+        "coefficient": 1.2
+      }
+    ]
+  },
+  
+  "formCoefficients": {
+    "description": "建筑形式系数",
+    "types": {
+      "single": {
+        "name": "单体",
+        "coefficient": 1.0
+      },
+      "complex": {
+        "name": "组合体",
+        "coefficient": 1.1
+      }
+    }
+  },
+  
+  "podiumRatioCoefficients": {
+    "description": "裙楼面积比系数",
+    "ranges": [
+      {
+        "name": "无裙楼",
+        "minRatio": 0,
+        "maxRatio": 0,
+        "coefficient": 1.0
+      },
+      {
+        "name": "小于10%",
+        "minRatio": 0.01,
+        "maxRatio": 0.1,
+        "coefficient": 0.9
+      },
+      {
+        "name": "10%-30%",
+        "minRatio": 0.11,
+        "maxRatio": 0.3,
+        "coefficient": 0.85
+      },
+      {
+        "name": "大于30%",
+        "minRatio": 0.31,
+        "maxRatio": 1.0,
+        "coefficient": 0.8
+      }
+    ]
+  },
+  
+  "basementRatioCoefficients": {
+    "description": "地下室面积比系数",
+    "ranges": [
+      {
+        "name": "无地下室",
+        "minRatio": 0,
+        "maxRatio": 0,
+        "coefficient": 1.0
+      },
+      {
+        "name": "小于20%",
+        "minRatio": 0.01,
+        "maxRatio": 0.2,
+        "coefficient": 1.0
+      },
+      {
+        "name": "20%-50%",
+        "minRatio": 0.21,
+        "maxRatio": 0.5,
+        "coefficient": 1.05
+      },
+      {
+        "name": "大于50%",
+        "minRatio": 0.51,
+        "maxRatio": 1.0,
+        "coefficient": 1.1
+      }
+    ]
+  },
+  
+  "specialAttributes": {
+    "description": "特殊属性加成（已废弃，保留用于兼容）",
+    "hasBasement": {
+      "name": "有地下室",
+      "bonus": 0,
+      "note": "已通过basementRatioCoefficients处理"
+    },
+    "hasCivilDefense": {
+      "name": "有人防设计",
+      "bonus": 0.10
+    },
+    "isGreenBuilding": {
+      "name": "绿建设计",
+      "bonus": 0.05
+    },
+    "isPrefabricated": {
+      "name": "装配式建筑",
+      "bonus": 0.08
+    },
+    "isReportingProject": {
+      "name": "报建项目",
+      "bonus": 0.03
+    },
+    "isReviewProject": {
+      "name": "审图项目",
+      "bonus": 0.03
+    }
+  },
+  
+  "departments": [
+    { "id": "arch", "name": "建筑部" },
+    { "id": "structure", "name": "结构部" },
+    { "id": "water", "name": "给排水部" },
+    { "id": "electric", "name": "电气部" },
+    { "id": "hvac", "name": "空调部" }
+  ],
+  
+  "airConditioningTypes": {
+    "none": {
+      "name": "没有空调",
+      "coefficients": {
+        "arch": 0.375,
+        "structure": 0.365,
+        "water": 0.12,
+        "electric": 0.14,
+        "hvac": 0.0
+      }
+    },
+    "centralAC": {
+      "name": "全中央空调",
+      "coefficients": {
+        "arch": 0.328125,
+        "structure": 0.318125,
+        "water": 0.104375,
+        "electric": 0.124375,
+        "hvac": 0.125
+      }
+    },
+    "vrvWithPipe": {
+      "name": "VRV空调（布管）",
+      "coefficients": {
+        "arch": 0.331875,
+        "structure": 0.321875,
+        "water": 0.105625,
+        "electric": 0.125625,
+        "hvac": 0.115
+      }
+    },
+    "vrvWithoutPipe": {
+      "name": "VRV空调（不布管）",
+      "coefficients": {
+        "arch": 0.36,
+        "structure": 0.35,
+        "water": 0.115,
+        "electric": 0.135,
+        "hvac": 0.04
+      }
+    },
+    "splitACWithSmoke": {
+      "name": "分体空调及消防排烟",
+      "coefficients": {
+        "arch": 0.36375,
+        "structure": 0.35375,
+        "water": 0.11625,
+        "electric": 0.13625,
+        "hvac": 0.03
+      }
+    },
+    "splitACOnly": {
+      "name": "仅有分体空调",
+      "coefficients": {
+        "arch": 0.369375,
+        "structure": 0.359375,
+        "water": 0.118125,
+        "electric": 0.138125,
+        "hvac": 0.015
+      }
+    },
+    "smokeOnly": {
+      "name": "仅有消防排烟",
+      "coefficients": {
+        "arch": 0.35,
+        "structure": 0.34,
+        "water": 0.12,
+        "electric": 0.16,
+        "hvac": 0.03
+      }
+    },
+    "basementVentilation": {
+      "name": "地下室通风及消防排烟",
+      "coefficients": {
+        "arch": 0.3,
+        "structure": 0.4,
+        "water": 0.15,
+        "electric": 0.2,
+        "hvac": 0.05
+      }
+    }
+  }
+}

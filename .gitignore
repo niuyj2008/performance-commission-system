@@ -1,0 +1,13 @@
+node_modules/
+.env
+data/*.sqlite
+database.sqlite
+uploads/
+*.log
+.DS_Store
+*.rar
+2025上半年/
+项目/
+
+# Render
+.render/

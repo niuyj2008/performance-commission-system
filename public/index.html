@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绩效提成管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #1890ff;
+            font-size: 24px;
+        }
+        
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            color: #52c41a;
+        }
+        
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .user-name {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .btn-logout {
+            padding: 6px 16px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #ff7875;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>绩效提成管理系统</h1>
+                <div>
+                    <span id="userName" style="margin-right: 15px; color: #666;"></span>
+                    <button onclick="logout()" style="padding: 8px 16px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;">退出登录</button>
+                </div>
+            </div>
+            <div class="status" id="status">正在检查系统状态...</div>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 20px; color: #333;">功能导航</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <a href="/projects.html" style="display: block; padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; text-decoration: none; color: white; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📁</div>
+                    <div style="font-weight: 500; font-size: 16px;">项目管理</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">创建项目和计算提成</div>
+                </a>
+                <a href="/employees.html" style="display: block; padding: 30px 20px; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 8px; text-decoration: none; color: white; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 48px; margin-bottom: 10px;">👥</div>
+                    <div style="font-weight: 500; font-size: 16px;">员工管理</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">管理公司员工信息</div>
+                </a>
+                <a href="/payments.html" style="display: block; padding: 30px 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; text-decoration: none; color: white; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 48px; margin-bottom: 10px;">💰</div>
+                    <div style="font-weight: 500; font-size: 16px;">发放记录</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">查看和管理发放记录</div>
+                </a>
+                <a href="/reports.html" style="display: block; padding: 30px 20px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; text-decoration: none; color: white; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+                    <div style="font-weight: 500; font-size: 16px;">发放汇总</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">员工和部门汇总报表</div>
+                </a>
+                <a href="/config.html" style="display: block; padding: 30px 20px; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); border-radius: 8px; text-decoration: none; color: white; text-align: center; transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="font-size: 48px; margin-bottom: 10px;">⚙️</div>
+                    <div style="font-weight: 500; font-size: 16px;">系统配置</div>
+                    <div style="font-size: 12px; opacity: 0.9; margin-top: 5px;">配置计算参数</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        let token = localStorage.getItem('token');
+        
+        // 检查登录状态
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+        
+        // 获取当前用户信息
+        fetch(`${API_BASE}/users/me`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('未登录');
+            }
+            return res.json();
+        })
+        .then(data => {
+            const roleNames = {
+                'admin': '管理员',
+                'finance': '财务',
+                'manager': '部门经理',
+                'employee': '员工'
+            };
+            document.getElementById('userName').textContent = `${data.user.name} (${roleNames[data.user.role]})`;
+        })
+        .catch(err => {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        });
+        
+        // 检查API状态
+        fetch('/api/health')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status').textContent = '✓ ' + data.message;
+            })
+            .catch(err => {
+                document.getElementById('status').textContent = '✗ 无法连接到服务器';
+                document.getElementById('status').style.background = '#fff2e8';
+                document.getElementById('status').style.borderColor = '#ffbb96';
+                document.getElementById('status').style.color = '#fa8c16';
+            });
+        
+        // 退出登录
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('token');
+                window.location.href = '/login.html';
+            }
+        }
+    </script>
+</body>
+</html>

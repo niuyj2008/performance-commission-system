@@ -1,0 +1,187 @@
+{
+  "version": "2.0.0",
+  "description": "提成计算配置 - 基于韶谷数码城项目奖金发放计算表(20200629)",
+  
+  "stageAllocation": {
+    "description": "阶段分配比例",
+    "scheme": 0.15,
+    "construction": 0.85
+  },
+  
+  "chiefAllocation": {
+    "description": "总负责分配比例（从施工图金额中分配）",
+    "chief": 0.07,
+    "departments": 0.93
+  },
+  
+  "level1": {
+    "description": "第一级：项目提成总额计算配置",
+    
+    "buildingTypes": {
+      "office": {
+        "name": "办公楼",
+        "baseRate": 5.0,
+        "description": "每平米基础提成率（元/㎡）"
+      },
+      "residential": {
+        "name": "住宅",
+        "baseRate": 4.0
+      },
+      "school": {
+        "name": "学校",
+        "baseRate": 4.5
+      },
+      "commercial": {
+        "name": "商业",
+        "baseRate": 5.5
+      },
+      "industrial": {
+        "name": "工业",
+        "baseRate": 4.0
+      },
+      "other": {
+        "name": "其他",
+        "baseRate": 3.5
+      }
+    },
+    
+    "designStages": {
+      "scheme": {
+        "name": "方案设计",
+        "coefficient": 0.6,
+        "description": "相对于施工图的系数"
+      },
+      "construction": {
+        "name": "施工图设计",
+        "coefficient": 1.0
+      },
+      "cooperation": {
+        "name": "施工配合",
+        "coefficient": 0.4
+      }
+    },
+    
+    "specialAttributes": {
+      "hasBasement": {
+        "name": "有地下室",
+        "bonus": 0.15,
+        "description": "增加15%"
+      },
+      "hasCivilDefense": {
+        "name": "有人防设计",
+        "bonus": 0.10
+      },
+      "isGreenBuilding": {
+        "name": "绿建设计",
+        "bonus": 0.05
+      },
+      "isPrefabricated": {
+        "name": "装配式建筑",
+        "bonus": 0.08
+      },
+      "isReportingProject": {
+        "name": "报建项目",
+        "bonus": 0.03
+      },
+      "isReviewProject": {
+        "name": "审图项目",
+        "bonus": 0.03
+      }
+    }
+  },
+  
+  "level2": {
+    "description": "第二级：部门分配计算配置（基于空调面积表）",
+    
+    "departments": [
+      { "id": "arch", "name": "建筑部" },
+      { "id": "structure", "name": "结构部" },
+      { "id": "water", "name": "给排水部" },
+      { "id": "electric", "name": "电气部" },
+      { "id": "hvac", "name": "空调部" }
+    ],
+    
+    "airConditioningTypes": {
+      "none": {
+        "name": "没有空调",
+        "coefficients": {
+          "arch": 0.375,
+          "structure": 0.365,
+          "water": 0.12,
+          "electric": 0.14,
+          "hvac": 0.0
+        }
+      },
+      "centralAC": {
+        "name": "全中央空调",
+        "coefficients": {
+          "arch": 0.328125,
+          "structure": 0.318125,
+          "water": 0.104375,
+          "electric": 0.124375,
+          "hvac": 0.125
+        }
+      },
+      "vrvWithPipe": {
+        "name": "VRV空调（布管）",
+        "coefficients": {
+          "arch": 0.331875,
+          "structure": 0.321875,
+          "water": 0.105625,
+          "electric": 0.125625,
+          "hvac": 0.115
+        }
+      },
+      "vrvWithoutPipe": {
+        "name": "VRV空调（不布管）",
+        "coefficients": {
+          "arch": 0.36,
+          "structure": 0.35,
+          "water": 0.115,
+          "electric": 0.135,
+          "hvac": 0.04
+        }
+      },
+      "splitACWithSmoke": {
+        "name": "分体空调及消防排烟",
+        "coefficients": {
+          "arch": 0.36375,
+          "structure": 0.35375,
+          "water": 0.11625,
+          "electric": 0.13625,
+          "hvac": 0.03
+        }
+      },
+      "splitACOnly": {
+        "name": "仅有分体空调",
+        "coefficients": {
+          "arch": 0.369375,
+          "structure": 0.359375,
+          "water": 0.118125,
+          "electric": 0.138125,
+          "hvac": 0.015
+        }
+      },
+      "smokeOnly": {
+        "name": "仅有消防排烟",
+        "coefficients": {
+          "arch": 0.35,
+          "structure": 0.34,
+          "water": 0.12,
+          "electric": 0.16,
+          "hvac": 0.03
+        }
+      },
+      "basementVentilation": {
+        "name": "地下室通风及消防排烟",
+        "coefficients": {
+          "arch": 0.3,
+          "structure": 0.4,
+          "water": 0.15,
+          "electric": 0.2,
+          "hvac": 0.05
+        }
+      }
+    }
+  }
+}
