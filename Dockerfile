@@ -13,7 +13,9 @@ RUN npm ci --only=production
 # 复制项目文件
 COPY server ./server
 COPY public ./public
-COPY data ./data
+
+# 创建 data 目录（用于数据库文件）
+RUN mkdir -p /app/data
 
 # 暴露端口
 EXPOSE 3000
