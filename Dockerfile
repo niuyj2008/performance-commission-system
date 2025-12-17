@@ -14,8 +14,9 @@ RUN npm ci --only=production
 COPY server ./server
 COPY public ./public
 
-# 创建 data 目录（用于数据库文件）
+# 创建 data 目录并复制生产数据库
 RUN mkdir -p /app/data
+COPY database-production.sqlite /app/data/database.sqlite
 
 # 暴露端口
 EXPOSE 3000
