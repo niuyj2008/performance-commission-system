@@ -13,9 +13,3 @@ services:
         value: 3000
       - key: JWT_SECRET
         generateValue: true
-      - key: DATABASE_PATH
-        value: /opt/render/project/src/database.sqlite
-    disk:
-      name: data
-      mountPath: /opt/render/project/src
-      sizeGB: 1
