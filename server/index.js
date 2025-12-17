@@ -57,7 +57,12 @@ app.use((err, req, res, next) => {
 
 // 初始化数据库并启动服务器
 initDatabase()
-  .then(() => seedDatabase())
+  .then(() => {
+    // 只在环境变量 SEED_DATABASE=true 时才运行 seed
+    if (process.env.SEED_DATABASE === 'true') {
+      return seedDatabase();
+    }
+  })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`服务器运行在 http://localhost:${PORT}`);
