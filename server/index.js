@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const { initDatabase } = require('./db/init');
+const { seedDatabase } = require('./db/seed');
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const projectsRoutes = require('./routes/projects');
@@ -56,6 +57,7 @@ app.use((err, req, res, next) => {
 
 // 初始化数据库并启动服务器
 initDatabase()
+  .then(() => seedDatabase())
   .then(() => {
     app.listen(PORT, () => {
       console.log(`服务器运行在 http://localhost:${PORT}`);
