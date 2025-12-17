@@ -6,46 +6,131 @@ const { authenticate, requireAdminOrFinance } = require('../middleware/auth');
 /**
  * 获取项目列表
  * GET /api/projects
+ * 
+ * 权限说明：
+ * - admin/finance: 看到所有项目，显示项目总提成
+ * - manager: 只看到本部门有分配的项目，显示部门分配金额
+ * - employee: 看到所有项目（只读）
  */
 router.get('/', authenticate, (req, res) => {
   const { period, status, stage } = req.query;
+  const user = req.user;
   
-  let query = 'SELECT * FROM projects WHERE 1=1';
-  const params = [];
-  
-  if (period) {
-    query += ' AND period = ?';
-    params.push(period);
-  }
-  
-  if (status) {
-    query += ' AND status = ?';
-    params.push(status);
-  }
-  
-  if (stage) {
-    query += ' AND stage = ?';
-    params.push(stage);
-  }
-  
-  query += ' ORDER BY created_at DESC';
-  
-  db.all(query, params, (err, projects) => {
-    if (err) {
-      console.error('数据库错误:', err);
-      return res.status(500).json({ error: '服务器错误' });
+  // 如果是部门经理，需要特殊处理
+  if (user.role === 'manager' && user.departmentId) {
+    // 获取部门代码
+    db.get(
+      'SELECT code FROM departments WHERE id = ?',
+      [user.departmentId],
+      (err, department) => {
+        if (err) {
+          console.error('数据库错误:', err);
+          return res.status(500).json({ error: '服务器错误' });
+        }
+        
+        if (!department) {
+          return res.status(400).json({ error: '未找到部门信息' });
+        }
+        
+        // 查询该部门有分配的项目（使用 LOWER 处理大小写不匹配）
+        let query = `
+          SELECT DISTINCT 
+            p.*,
+            da.allocated_amount as department_allocated_amount,
+            da.allocation_weight as department_weight
+          FROM projects p
+          INNER JOIN department_allocations da ON p.id = da.project_id
+          WHERE LOWER(da.department_id) = LOWER(?)
+        `;
+        const params = [department.code];
+        
+        console.log(`[Manager View] 部门经理查询项目 - 部门代码: ${department.code}, 用户: ${user.username}`);
+        
+        if (period) {
+          query += ' AND p.period = ?';
+          params.push(period);
+        }
+        
+        if (status) {
+          query += ' AND p.status = ?';
+          params.push(status);
+        }
+        
+        if (stage) {
+          query += ' AND p.stage = ?';
+          params.push(stage);
+        }
+        
+        query += ' ORDER BY p.created_at DESC';
+        
+        console.log(`[Manager View] SQL: ${query}`);
+        console.log(`[Manager View] Params:`, params);
+        
+        db.all(query, params, (err, projects) => {
+          if (err) {
+            console.error('[Manager View] 数据库错误:', err);
+            return res.status(500).json({ error: '服务器错误' });
+          }
+          
+          console.log(`[Manager View] 查询到 ${projects.length} 个项目`);
+          
+          // 对于部门经理，将 calculated_commission 替换为部门分配金额
+          const managerProjects = projects.map(p => ({
+            ...p,
+            calculated_commission: p.department_allocated_amount,
+            is_manager_view: true,
+            department_code: department.code
+          }));
+          
+          res.json({ projects: managerProjects });
+        });
+      }
+    );
+  } else {
+    // admin/finance/employee 看到所有项目
+    let query = 'SELECT * FROM projects WHERE 1=1';
+    const params = [];
+    
+    if (period) {
+      query += ' AND period = ?';
+      params.push(period);
     }
     
-    res.json({ projects });
-  });
+    if (status) {
+      query += ' AND status = ?';
+      params.push(status);
+    }
+    
+    if (stage) {
+      query += ' AND stage = ?';
+      params.push(stage);
+    }
+    
+    query += ' ORDER BY created_at DESC';
+    
+    db.all(query, params, (err, projects) => {
+      if (err) {
+        console.error('数据库错误:', err);
+        return res.status(500).json({ error: '服务器错误' });
+      }
+      
+      res.json({ projects });
+    });
+  }
 });
 
 /**
  * 获取单个项目详情
  * GET /api/projects/:id
+ * 
+ * 权限说明：
+ * - admin/finance: 看到项目总提成
+ * - manager: 看到部门分配金额
+ * - employee: 看到项目总提成（只读）
  */
 router.get('/:id', authenticate, (req, res) => {
   const { id } = req.params;
+  const user = req.user;
   
   db.get('SELECT * FROM projects WHERE id = ?', [id], (err, project) => {
     if (err) {
@@ -57,7 +142,47 @@ router.get('/:id', authenticate, (req, res) => {
       return res.status(404).json({ error: '项目不存在' });
     }
     
-    res.json({ project });
+    // 如果是部门经理，替换为部门分配金额
+    if (user.role === 'manager' && user.departmentId) {
+      db.get(
+        'SELECT code FROM departments WHERE id = ?',
+        [user.departmentId],
+        (err, department) => {
+          if (err) {
+            console.error('数据库错误:', err);
+            return res.status(500).json({ error: '服务器错误' });
+          }
+          
+          if (!department) {
+            return res.json({ project });
+          }
+          
+          // 获取部门分配金额（使用 LOWER 处理大小写不匹配）
+          db.get(
+            'SELECT allocated_amount, allocation_weight FROM department_allocations WHERE project_id = ? AND LOWER(department_id) = LOWER(?)',
+            [id, department.code],
+            (err, allocation) => {
+              if (err) {
+                console.error('数据库错误:', err);
+                return res.status(500).json({ error: '服务器错误' });
+              }
+              
+              if (allocation) {
+                project.calculated_commission = allocation.allocated_amount;
+                project.department_allocated_amount = allocation.allocated_amount;
+                project.department_weight = allocation.allocation_weight;
+                project.is_manager_view = true;
+                project.department_code = department.code;
+              }
+              
+              res.json({ project });
+            }
+          );
+        }
+      );
+    } else {
+      res.json({ project });
+    }
   });
 });
 
