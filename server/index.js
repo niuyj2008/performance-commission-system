@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const { initDatabase } = require('./db/init');
 const { seedDatabase } = require('./db/seed');
+const { restoreProductionDataIfNeeded } = require('./db/restore-production-data');
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const projectsRoutes = require('./routes/projects');
@@ -58,8 +59,13 @@ app.use((err, req, res, next) => {
 // 初始化数据库并启动服务器
 initDatabase()
   .then(() => {
+    // 尝试恢复生产数据
+    return restoreProductionDataIfNeeded();
+  })
+  .then((restored) => {
     // 只在环境变量 SEED_DATABASE=true 时才运行 seed
-    if (process.env.SEED_DATABASE === 'true') {
+    // 并且只在没有恢复生产数据的情况下
+    if (!restored && process.env.SEED_DATABASE === 'true') {
       return seedDatabase();
     }
   })
